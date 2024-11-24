@@ -42,7 +42,6 @@ local callmangle = luau.load(bytecode, {
 
 local exports = callmangle()
 exports(nil, {}, {
-	hashes = if corePackage.config.hashed then corePackage.hashes else nil,
 	objects = corePackage.objects
 }).__STANDALONE_ENTRY(corePackage, PackageContentAvailable and Depackage(PackageContent))
 

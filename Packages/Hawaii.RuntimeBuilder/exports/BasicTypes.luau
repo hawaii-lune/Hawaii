@@ -33,21 +33,7 @@ function BasicTypes.ReadString(b: buffer, offsetPtr: OffsetPointer): string
 	local sizeof = BasicTypes.ULEB128(b, offsetPtr)
 	local offset = offsetPtr.offset
 	offsetPtr.offset += sizeof
-
 	return buffer.readstring(b, offset, sizeof)
-end
-
-function BasicTypes.Hash256(b: buffer, offsetPtr: OffsetPointer): string
-	--- read 4 subsections
-	local offset = offsetPtr.offset
-	offsetPtr.offset += 16
-	local H1, H2, H3, H4 = 
-		buffer.readu32(b, offset),
-		buffer.readu32(b, offset + 4),
-		buffer.readu32(b, offset + 8),
-		buffer.readu32(b, offset + 12)
-
-	return string.format("%x%x%x%x", H1, H2, H3, H4)
 end
 
 return BasicTypes
