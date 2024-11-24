@@ -106,7 +106,7 @@ if ENABLE_PROC_GEN then
 	process.spawn("darklua", {"process", "build/init.luau", "build/out/a.luau"}, {
 		stdio = "inherit"
 	})
-	process.spawn("lune", {"build", "-t", "win-x86_64", "-o", "build/out/hawaii.exe", "build/out/proc.luau"}, {
+	process.spawn("lune", {"build", "-t", "win-x86_64", "-o", "build/out/hawaii.exe", "build/out/a.luau"}, {
 		stdio = "inherit"
 	})
 end
