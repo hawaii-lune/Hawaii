@@ -2,10 +2,20 @@
 -- when Runtime can successfully build itself,
 -- this can be scrapped
 
+-- Location of package
 local TO_BUILD = "./Packages/Hawaii.Runtime/src"
+
+-- How wide to output the Base64 formatted HWI files
 local COLUMN_SIZE = 80
-local ALWAYS_REBUILD = true
+
+-- Force rebuild the /build/directory
+local ALWAYS_REBUILD = false
+
+-- Set Luau compile options to "RELEASE"
 local TARGET_RELEASE = false
+
+-- Automatically debug the output object
+local AUTO_DEBUG = true
 
 local serde = require("@lune/serde")
 local luau = require("@lune/luau")
@@ -87,7 +97,6 @@ if ALWAYS_REBUILD or not fs.isDir("build") then fs.copy("Packages/Hawaii.Runtime
 fs.writeFile("build/Hawaii.Runtime.hwi", table.concat(streamblobs))
 fs.writeFile("build/core.hwi.luau", `return ([[\n{table.concat(sections, "\n")}\n]])`)
 
-local AUTO_DEBUG = true
 if AUTO_DEBUG then
 	print("Built Runtime.hwi, debugging is enabled. Debugging Hawaii...")
 	local process = require("@lune/process")
