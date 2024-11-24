@@ -1,0 +1,5 @@
+name = "Hawaii"
+
+[targets]
+CLI = {path = "packages/Hawaii.CLI"}
+HWILoader = {path = "packages/Hawaii.HWILoader"}

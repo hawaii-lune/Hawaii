@@ -1,0 +1,13 @@
+# Note: This project needs to duplicate a bit of code from Hawaii.CoreRuntime
+# because this is deauthored from Hawaii itself
+
+name = "Hawaii.HWILoader"
+
+[directories]
+source = "src"
+objects = "exports"
+
+[options]
+# we need exact access control to copy the package into new executables
+compile = true
+hashed = false

@@ -1,0 +1,11 @@
+{
+  "luau-lsp.require.directoryAliases": {
+    "@lune/": "~/.lune/.typedefs/0.8.9/"
+  },
+  "luau-lsp.fflags.override": {
+    "LuauSolverV2": "false"
+  },
+  "luau-lsp.types.definitionFiles": [
+    "hawaii.d.luau"
+  ]
+}

@@ -1,0 +1,15 @@
+# Main runtime
+# Objects under HWILoader are used for generating a standalone runtime blob
+# Note, the Runtime is usually included as "CoreRuntime.hwi"
+
+name = "Hawaii.Runtime"
+
+[directories]
+source = "src"
+
+[options]
+# we need exact access control to copy the package into new executables
+# we could benefit from directly compiling the source here
+# but it could not be decompiled again
+compile = false
+hashed = false
