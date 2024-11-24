@@ -17,13 +17,16 @@ local TARGET_RELEASE = false
 -- Automatically debug the output object
 local AUTO_DEBUG = true
 
+-- Enables generation of an executable
+-- This should remain disabled for now as this might not play nice
+-- with antivirus solutions
+local ENABLE_PROC_GEN = false
+
 local serde = require("@lune/serde")
 local luau = require("@lune/luau")
 local fs = require("@lune/fs")
 local Base64 = require("./Base64")
-
-local sourcePath = "/source/init.luau"
-
+local process = require("@lune/process")
 local streamblobs = {"HWI\x00\x0EHawaii.Runtime\7\17/source/init.luau\0"}
 
 local function writeULEB128(n)
@@ -97,10 +100,26 @@ if ALWAYS_REBUILD or not fs.isDir("build") then fs.copy("Packages/Hawaii.Runtime
 fs.writeFile("build/Hawaii.Runtime.hwi", table.concat(streamblobs))
 fs.writeFile("build/core.hwi.luau", `return ([[\n{table.concat(sections, "\n")}\n]])`)
 
-if AUTO_DEBUG then
-	print("Built Runtime.hwi, debugging is enabled. Debugging Hawaii...")
-	local process = require("@lune/process")
-	process.spawn("lune", {"run",  "build"}, {
+if ENABLE_PROC_GEN then
+	warn("Process Generation is currently unstable and may produce unreliable results")
+	
+	process.spawn("darklua", {"process", "build/init.luau", "build/out/a.luau"}, {
 		stdio = "inherit"
 	})
+	process.spawn("lune", {"build", "-t", "win-x86_64", "-o", "build/out/hawaii.exe", "build/out/proc.luau"}, {
+		stdio = "inherit"
+	})
+end
+
+if AUTO_DEBUG then
+	print("Built Runtime.hwi, debugging is enabled. Debugging Hawaii...")
+	if ENABLE_PROC_GEN then
+		process.spawn("build/out/hawaii",  {}, {
+			stdio = "inherit"
+		})
+	else
+		process.spawn("lune", {"run",  "build"}, {
+			stdio = "inherit"
+		})
+	end
 end

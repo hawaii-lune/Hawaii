@@ -7,8 +7,8 @@ local luau = require("@lune/luau")
 local HWI = require("./HWI")
 local Base64 = require("./Base64")
 
-local CoreHWIContent = require("./core.hwi")
-local PackageContentAvailable, PackageContent = pcall(require, "./.chwi")
+local CoreHWIContent = require("./core.hwi.luau")
+local PackageContentAvailable, PackageContent = pcall(require, "./.chwi.luau")
 
 if not PackageContentAvailable then
 	warn(".chwi.luau is empty")

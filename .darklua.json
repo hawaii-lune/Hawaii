@@ -1,0 +1,9 @@
+{
+	"generator": "readable",
+
+  "bundle": {
+    "modules_identifier": "__DARKLUA_BUNDLE_MODULES",
+    "excludes": ["@lune/**"],
+    "require_mode": "path"
+  }
+}
