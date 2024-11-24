@@ -4,14 +4,17 @@
 
 local TO_BUILD = "./Packages/Hawaii.Runtime/src"
 local COLUMN_SIZE = 80
+local ALWAYS_REBUILD = true
+local TARGET_RELEASE = false
 
 local serde = require("@lune/serde")
+local luau = require("@lune/luau")
 local fs = require("@lune/fs")
 local Base64 = require("./Base64")
 
 local sourcePath = "/source/init.luau"
 
-local streamblobs = {"HWI\x00\x0EHawaii.Runtime\9\x69\xF2\x3C\xF2\xB1\x9B\x8C\xA7\xE1\xBA\x2D\xDE\xA4\x16\x64\x59\0"}
+local streamblobs = {"HWI\x00\x0EHawaii.Runtime\7\17/source/init.luau\0"}
 
 local function writeULEB128(n)
 	local result = {}
@@ -53,23 +56,17 @@ end
 local objects = buildDirectoryTree(TO_BUILD)
 table.insert(streamblobs, writeULEB128(objSize))
 
-local HASH_WIDTH = 32
-local function hashEncode(hash)
-	local hashBytes = {}
-	for i = 1, HASH_WIDTH - 1, 2 do
-		local digit = tonumber(string.sub(hash, i, i+1), 16)
-		table.insert(hashBytes, string.char(digit))
-	end
-
-	return table.concat(hashBytes)
-end
-
 for objectName, content in objects do
-	local objectNameHash = serde.hash("sha3-256", objectName)
 	table.insert(streamblobs, `{writeULEB128(#objectName)}{objectName}`)
-	table.insert(streamblobs, `{hashEncode(objectNameHash)}`)
-	table.insert(streamblobs, writeULEB128(#content))
-	table.insert(streamblobs, content)
+	local bytecode = luau.compile(content, {
+		optimizationLevel = if TARGET_RELEASE then 2 else 1,
+		coverageLevel = 0,
+		debugLevel = if TARGET_RELEASE then 0 else 1
+	})
+
+	local contentCompressed = serde.compress("zlib", bytecode)
+	table.insert(streamblobs, writeULEB128(#contentCompressed))
+	table.insert(streamblobs, contentCompressed)
 end
 
 local hwiFile = Base64.encode(buffer.fromstring(table.concat(streamblobs)))
@@ -86,8 +83,7 @@ for i = 1, lines do
 end
 
 -- clone exports in Hawaii.RuntimeBuilder to /build
-fs.copy("Packages/Hawaii.RuntimeBuilder/exports", "build", true)
-
+if ALWAYS_REBUILD or not fs.isDir("build") then fs.copy("Packages/Hawaii.RuntimeBuilder/exports", "build", ALWAYS_REBUILD) end
 fs.writeFile("build/Hawaii.Runtime.hwi", table.concat(streamblobs))
 fs.writeFile("build/core.hwi.luau", `return ([[\n{table.concat(sections, "\n")}\n]])`)
 
