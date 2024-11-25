@@ -144,18 +144,12 @@ end
 
 buildDependencyTree(ENTRY_POINT)
 local HWIFileStreams = {}
-local bootstrapper = ""
-
 if ALWAYS_REBUILD or not fs.isDir("build") then fs.copy("Packages/Hawaii.Bootstrapper/exports", "build", ALWAYS_REBUILD) end
 
 for package, configs in buildchain do
 	local stream = buildHWI(configs)
 	fs.writeFile(`build/{package}.hwi`, stream)
 	table.insert(HWIFileStreams, {name = package, obj = serde.compress("zlib", stream)})
-
-	if package == "Hawaii.System" then
-		bootstrapper = stream
-	end
 end
 
 -- pack streams into CHWI
@@ -188,7 +182,6 @@ end
 
 -- clone exports in Hawaii.RuntimeBuilder to /build
 writeBin(chwi, "build/.chwi.luau")
-writeBin(bootstrapper, "build/system.hwi.luau")
 
 if ENABLE_PROC_GEN then
 	warn("Process Generation is currently unstable and may produce unreliable results")

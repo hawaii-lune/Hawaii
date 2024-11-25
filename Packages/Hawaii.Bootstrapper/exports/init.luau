@@ -10,15 +10,12 @@ Bookstrapper:Initialize("Hawaii.Bootstrapper")
 
 Bookstrapper = {}
 
-local luau = require("@lune/luau")
-local HWI = require("./HWI")
 local CHWI = require("./CHWI")
 local Base64 = require("./Base64")
 local process = require("@lune/process")
 
-local ImportScript = require("./system.hwi.luau")
+local ImportEngine = require("./ImportEngine")
 local PackageContent = require("./.chwi.luau")
-
 
 local function Depackage(source: string)
 	local rawB64 = string.gsub(source, "\n", "")
@@ -26,43 +23,23 @@ local function Depackage(source: string)
 	return Base64.decode(stream)
 end
 
-local corePackage = HWI(Depackage(ImportScript))
 local chwiPackage = CHWI(Depackage(PackageContent))
 
 -- The CorePackage contains code to pick itself up from an external entry, the entry point is known as the
 -- "starter"
 
-local function HWI_LOADMODULE(path)
-	local obj = corePackage.objects[path]
-	local bytecode = buffer.tostring(obj:Open())
+local context = ImportEngine.Public.fromCHWI(chwiPackage)
+local sysPkg = context.Packages["Hawaii.System"]
 
-	if not corePackage.config.compiled then
-		bytecode = luau.compile(bytecode, {
-			optimizationLevel = 2,
-			coverageLevel = 0,
-			debugLevel = 1
-		})
-	end
+ImportEngine.setExport(context, sysPkg, "/FFI/Bootstrapper.luau", {
+	ImportEngine = ImportEngine.Public,
+	Bookstrapper = Bookstrapper,
+	-- TODO: allow these dependencies into system
+	-- HWI = require("./HWI")
+	-- CHWI = CHWI
+})
 
-	local callmangle = luau.load(bytecode, {
-		debugName = `{corePackage.name}{obj.filePath}`,
-		codegenEnabled = corePackage.config.native
-	})
-
-	local ex = {
-		Bookstrapper = Bookstrapper
-	}
-
-	if callmangle()(nil, ex, {objects = corePackage.objects}) ~= ex then
-		error(`module {path} did not return exports`)
-	end
-
-	table.freeze(ex)
-	return ex
-end
-
-local importEngine = HWI_LOADMODULE("/source/BootstrapperHook.luau").ImportEngine
-local context = importEngine.fromCHWI(chwiPackage)
+print(context.Packages["Hawaii.System"].Modules["/FFI/Bootstrapper.luau"].Bookstrapper)
 
 local argv = process.args
 context:Run(argv)

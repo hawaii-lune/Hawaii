@@ -1,11 +1,13 @@
 -- This implements the Import syntax when loaded by the bootstrapper
--- But also provides the RuntimeContext system
 -- These are relatively low-level APIs and can break stuff if not used
 -- correctly
+
+-- This also propegates other exports as needed
+
 -- required to propegate import into the package
-local PACKAGE_NAME = "Hawaii.System"
-local FILE_NAME = "/source/BootstrapperHook.luau"
-local ImportEngine = {}
+local ImportEngine = {
+	Public = {}
+}
 
 local luau = require("@lune/luau")
 type Exportable = {[string]: any}
@@ -99,8 +101,8 @@ local function generateRelativeImporter(self: RuntimeContext, ctx: PackageContex
 	end
 end
 
-local function Exportable(self: RuntimeContext, package: PackageContext, object: string): Exportable
-	local exportable = setmetatable({}, {
+local function Exportable(self: RuntimeContext, package: PackageContext, object: string, table: {[string]: any}?): Exportable
+	local exportable = setmetatable(table or {}, {
 		__tostring = function()
 			return `Module<{self.Name}:{package.Name}{object}>`
 		end,
@@ -161,7 +163,7 @@ local function threadWorker(
 	table.clear(objectState.heldThreads)
 end
 
-function ImportEngine.newRuntimeContext(name: string): RuntimeContext
+function ImportEngine.Public.newRuntimeContext(name: string): RuntimeContext
 	local rtCTX = {} :: RuntimeContext
 	rtCTX.Name = name
 	rtCTX.Packages = {}
@@ -169,10 +171,6 @@ function ImportEngine.newRuntimeContext(name: string): RuntimeContext
 	function rtCTX.LoadObject(self: RuntimeContext, package: PackageContext, object: string): Exportable
 		-- loads and initialises a new object
 		-- first check if the object has already tried to be loaded
-
-		-- import propegate
-		if package.Name == PACKAGE_NAME and object == FILE_NAME then return exports end
-
 		local objectStateContext = package.Modules[object]
 
 		if not objectStateContext then
@@ -258,8 +256,8 @@ function ImportEngine.newRuntimeContext(name: string): RuntimeContext
 	return rtCTX
 end
 
-function ImportEngine.fromCHWI(chwi): RuntimeContext
-	local rtCTX: RuntimeContext = ImportEngine.newRuntimeContext(chwi.name)
+function ImportEngine.Public.fromCHWI(chwi): RuntimeContext
+	local rtCTX: RuntimeContext = ImportEngine.Public.newRuntimeContext(chwi.name)
 
 	for _, packageStream in chwi.packages do
 		local object = packageStream:Open()
@@ -270,5 +268,18 @@ function ImportEngine.fromCHWI(chwi): RuntimeContext
 	return rtCTX
 end
 
-exports.ImportEngine = ImportEngine
-return exports
+-- Mainly an internal layer for /FFI:Bootstrapper/ in the System package, this bypasses the file io check
+-- and just loads it
+function ImportEngine.setExport(context: RuntimeContext, packageContext: PackageContext, object: string, exportTable)
+	local exp = Exportable(context, packageContext, object, exportTable)
+
+	packageContext.Modules[object] = {
+		loaded = true,
+		export = exp,
+		luaOk = true,
+		luaErr = nil,
+		heldThreads = {}
+	}
+end
+
+return ImportEngine
