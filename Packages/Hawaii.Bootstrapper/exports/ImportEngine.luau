@@ -2,16 +2,16 @@
 -- These are relatively low-level APIs and can break stuff if not used
 -- correctly
 
--- This also propegates other exports as needed
+local HWI = require("./HWI")
+local CHWI = require("./CHWI")
 
--- required to propegate import into the package
 local ImportEngine = {
 	Public = {}
 }
 
 local luau = require("@lune/luau")
 type Exportable = {[string]: any}
-type HWI = {[string]: any}
+type HWI = HWI.HWIPackage
 
 type PackageContext = {
 	Name: string,
@@ -256,7 +256,7 @@ function ImportEngine.Public.newRuntimeContext(name: string): RuntimeContext
 	return rtCTX
 end
 
-function ImportEngine.Public.fromCHWI(chwi): RuntimeContext
+function ImportEngine.Public.fromCHWI(chwi: CHWI.CHWIPackage): RuntimeContext
 	local rtCTX: RuntimeContext = ImportEngine.Public.newRuntimeContext(chwi.name)
 
 	for _, packageStream in chwi.packages do
