@@ -2,9 +2,12 @@
 -- But also provides the RuntimeContext system
 -- These are relatively low-level APIs and can break stuff if not used
 -- correctly
+-- required to propegate import into the package
+local PACKAGE_NAME = "Hawaii.System"
+local FILE_NAME = "/source/BootstrapperHook.luau"
+local ImportEngine = {}
 
 local luau = require("@lune/luau")
-
 type Exportable = {[string]: any}
 type HWI = {[string]: any}
 
@@ -53,7 +56,6 @@ local function generateRelativeImporter(self: RuntimeContext, ctx: PackageContex
 	return function(...: string)
 		local captured = {...}
 		local sizeCaptured = #captured
-
 		if sizeCaptured < 1 then error("at least one object must be imported") end
 
 		return {
@@ -66,12 +68,17 @@ local function generateRelativeImporter(self: RuntimeContext, ctx: PackageContex
 					-- package reference based on alias
 					local resolvedContext = ctx.LazyDependencies[rhs]
 					if not resolvedContext then error(`Cant find package from alias {rhs}`) end
-					
+
 					exportWorker = self:LoadPackage(resolvedContext)
 
 				elseif init == "/" then
 					-- fixed path in package itself
-					exportWorker = self:LoadObject(ctx, object)
+					-- attach.luau to the path if it doesn't end with it
+					if string.sub(package, -5) ~= ".luau" then
+						package ..= ".luau"
+					end
+
+					exportWorker = self:LoadObject(ctx, package)
 
 				else
 					error(`Cant find package or module {package}`)
@@ -154,7 +161,7 @@ local function threadWorker(
 	table.clear(objectState.heldThreads)
 end
 
-function exports.newRuntimeContext(name: string): RuntimeContext
+function ImportEngine.newRuntimeContext(name: string): RuntimeContext
 	local rtCTX = {} :: RuntimeContext
 	rtCTX.Name = name
 	rtCTX.Packages = {}
@@ -162,6 +169,10 @@ function exports.newRuntimeContext(name: string): RuntimeContext
 	function rtCTX.LoadObject(self: RuntimeContext, package: PackageContext, object: string): Exportable
 		-- loads and initialises a new object
 		-- first check if the object has already tried to be loaded
+
+		-- import propegate
+		if package.Name == PACKAGE_NAME and object == FILE_NAME then return exports end
+
 		local objectStateContext = package.Modules[object]
 
 		if not objectStateContext then
@@ -217,9 +228,9 @@ function exports.newRuntimeContext(name: string): RuntimeContext
 
 	function rtCTX.Run(self: RuntimeContext, args: {string})
 		local runtimePackage, runtimePath = getEntryItem(self)
-		local exports = self:LoadObject(runtimePackage, runtimePath)
-		if not exports.main then error("Cant load runtime package because its export does not have a main function") end
-		exports.main(#args, args)
+		local export = self:LoadObject(runtimePackage, runtimePath)
+		if not export.main then error("Cant load runtime package because its export does not have a main function") end
+		export.main(#args, args)
 	end
 
 	function rtCTX.AddPackage(self: RuntimeContext, packageObject: HWI, isEntry: boolean)
@@ -247,8 +258,8 @@ function exports.newRuntimeContext(name: string): RuntimeContext
 	return rtCTX
 end
 
-function exports.fromCHWI(chwi): RuntimeContext
-	local rtCTX: RuntimeContext = exports.newRuntimeContext(chwi.name)
+function ImportEngine.fromCHWI(chwi): RuntimeContext
+	local rtCTX: RuntimeContext = ImportEngine.newRuntimeContext(chwi.name)
 
 	for _, packageStream in chwi.packages do
 		local object = packageStream:Open()
@@ -259,4 +270,5 @@ function exports.fromCHWI(chwi): RuntimeContext
 	return rtCTX
 end
 
+exports.ImportEngine = ImportEngine
 return exports
