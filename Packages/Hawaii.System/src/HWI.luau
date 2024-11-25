@@ -1,1 +1,0 @@
--- Full HWI implementation instead of the loose implementation in the bootstrapper
