@@ -1,0 +1,8 @@
+name = "Hawaii.Builder"
+
+[directories]
+source = "src"
+
+[dependencies]
+Bootstrapper = {path = "../Hawaii.Bootstrapper"}
+System = {path = "../Hawaii.System"}

@@ -1,4 +1,6 @@
 
+local bookstrapper = import "Bookstrapper" .from "@System"
+
 function exports.main()
-	print(bf)
+	print(tostring(bookstrapper))
 end

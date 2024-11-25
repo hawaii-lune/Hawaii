@@ -3,6 +3,13 @@
 -- EXPECTED FILE SHAPE: "core.hwi.luau", ".chwi.luau"
 -- The chwi contents are passed as the argv node to the CoreRuntime
 
+--[[
+local Bookstrapper = require("./Bookstrapper")
+Bookstrapper:Initialize("Hawaii.Bootstrapper")
+]]--
+
+Bookstrapper = {}
+
 local luau = require("@lune/luau")
 local HWI = require("./HWI")
 local CHWI = require("./CHWI")
@@ -42,7 +49,9 @@ local function HWI_LOADMODULE(path)
 		codegenEnabled = corePackage.config.native
 	})
 
-	local ex = {}
+	local ex = {
+		Bookstrapper = Bookstrapper
+	}
 
 	if callmangle()(nil, ex, {objects = corePackage.objects}) ~= ex then
 		error(`module {path} did not return exports`)
@@ -52,7 +61,7 @@ local function HWI_LOADMODULE(path)
 	return ex
 end
 
-local importEngine = HWI_LOADMODULE("/source/BootstrapperHook.luau")
+local importEngine = HWI_LOADMODULE("/source/BootstrapperHook.luau").ImportEngine
 local context = importEngine.fromCHWI(chwiPackage)
 
 local argv = process.args

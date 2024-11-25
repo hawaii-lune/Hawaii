@@ -15,7 +15,7 @@ local COLUMN_SIZE = 80
 local ALWAYS_REBUILD = true
 
 -- Set Luau compile options to "RELEASE"
-local TARGET_RELEASE = true
+local TARGET_RELEASE = false
 
 -- Automatically debug the output object
 local AUTO_DEBUG = true
