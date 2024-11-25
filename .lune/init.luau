@@ -3,13 +3,13 @@
 -- this can be scrapped
 
 -- Location of package
-local TO_BUILD = "./Packages/Hawaii.Import/src"
+local TO_BUILD = "./Packages/Hawaii.System/src"
 
 -- How wide to output the Base64 formatted HWI files
 local COLUMN_SIZE = 80
 
 -- Force rebuild the /build/directory
-local ALWAYS_REBUILD = false
+local ALWAYS_REBUILD = true
 
 -- Set Luau compile options to "RELEASE"
 local TARGET_RELEASE = false
@@ -97,8 +97,8 @@ end
 
 -- clone exports in Hawaii.RuntimeBuilder to /build
 if ALWAYS_REBUILD or not fs.isDir("build") then fs.copy("Packages/Hawaii.Bootstrapper/exports", "build", ALWAYS_REBUILD) end
-fs.writeFile("build/Hawaii.Import.hwi", table.concat(streamblobs))
-fs.writeFile("build/engine.hwi.luau", `return ([[\n{table.concat(sections, "\n")}\n]])`)
+fs.writeFile("build/Hawaii.System.hwi", table.concat(streamblobs))
+fs.writeFile("build/system.hwi.luau", `return ([[\n{table.concat(sections, "\n")}\n]])`)
 
 if ENABLE_PROC_GEN then
 	warn("Process Generation is currently unstable and may produce unreliable results")
@@ -112,7 +112,7 @@ if ENABLE_PROC_GEN then
 end
 
 if AUTO_DEBUG then
-	print("Built Runtime.hwi, debugging is enabled. Debugging Hawaii...")
+	print("Built Hawaii.System.hwi, debugging is enabled. Debugging Hawaii...")
 	if ENABLE_PROC_GEN then
 		process.spawn("build/out/hawaii",  {}, {
 			stdio = "inherit"

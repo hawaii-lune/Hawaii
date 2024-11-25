@@ -17,9 +17,7 @@ local fs = require("@lune/fs") -- TODO: lune std bindings, this is an evil hack
 function exports.CreateBuildFragment(outDir: string, runtimeHWI: buffer, chwi: buffer)
 	local exportsObjectPatten = "^/objects/(.-)$"
 	local linkableSourceObjects = {}
-
-	if package.hashes then error("Package appears to be hashed, this is an internal error, please report this.") end
-
+	
 	for _, object in package.objects do
 		local objectName = string.match(object.Name, exportsObjectPatten)
 		if objectName then

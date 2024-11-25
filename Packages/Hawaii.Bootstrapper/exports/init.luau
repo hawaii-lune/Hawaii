@@ -5,9 +5,10 @@
 
 local luau = require("@lune/luau")
 local HWI = require("./HWI")
+local CHWI = require("./CHWI")
 local Base64 = require("./Base64")
 
-local ImportScript = require("./engine.hwi.luau")
+local ImportScript = require("./system.hwi.luau")
 local PackageContentAvailable, PackageContent = pcall(require, "./.chwi.luau")
 
 if not PackageContentAvailable then
@@ -20,7 +21,8 @@ local function Depackage(source: string)
 	return Base64.decode(stream)
 end
 
-local corePackage = HWI.fromStream(Depackage(ImportScript))
+local corePackage = HWI(Depackage(ImportScript))
+local chwiPackage = if PackageContentAvailable then CHWI(Depackage(PackageContent)) else nil
 
 -- The CorePackage contains code to pick itself up from an external entry, the entry point is known as the
 -- "starter"
@@ -47,10 +49,11 @@ local function HWI_LOADMODULE(path)
 	})
 end
 
-local importEngine = HWI_LOADMODULE(corePackage.config.entry)
+local importEngine = HWI_LOADMODULE("/source/BootstrapperHook.luau")
 local context = importEngine.newRuntimeContext()
 
-context:loadCHWI(PackageContentAvailable and Depackage(PackageContent))
-if not PackageContentAvailable then
+if chwiPackage then
+	context:loadCHWI(chwiPackage)
+else
 	print("RuntimeContext was loaded successfully, but no package is available")
 end

@@ -2,7 +2,6 @@
 local HWI_FORMAT_MIN_VERSION, HWI_FORMAT_MAX_VERSION = 0, 0
 local serde = require("@lune/serde")
 local BasicTypes = require("./BasicTypes.luau")
-local HWI = {}
 
 type HWIObject = {
 	compressed: boolean,
@@ -44,7 +43,7 @@ local function HWIObject(): HWIObject
 	}
 end
 
-function HWI.new(name: string): HWIPackage
+local function newHWI(name: string): HWIPackage
 	local hwi = {} :: HWIPackage
 	hwi.name = name
 	hwi.config = {
@@ -58,7 +57,7 @@ function HWI.new(name: string): HWIPackage
 	return hwi
 end
 
-function HWI.fromStream(b: buffer): HWIPackage
+return function(b: buffer): HWIPackage
 	if buffer.readstring(b, 0, 3) ~= "HWI" then
 		error("bad magic header")
 	end
@@ -100,7 +99,7 @@ function HWI.fromStream(b: buffer): HWIPackage
 	end
 	config.dependencies = dependencies
 
-	local pkg: HWIPackage = HWI.new(packageName)
+	local pkg: HWIPackage = newHWI(packageName)
 	pkg.config = config
 	local sizeHeaders = BasicTypes.ULEB128(b, offsetPtr)
 
@@ -126,9 +125,10 @@ function HWI.fromStream(b: buffer): HWIPackage
 			
 			pkg.objects[name] = obj
 		end
+
+		table.freeze(pkg.objects)
 	end
 
+	table.freeze(pkg)
 	return pkg
 end
-
-return HWI
