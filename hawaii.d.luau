@@ -8,7 +8,6 @@ type HWIObject = {
 
 type HWIPackage = {
 	objects: {[string]: HWIObject},
-	hashes: {[string]: string}?
 }
 
 --[=[

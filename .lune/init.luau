@@ -1,9 +1,9 @@
 -- Quick and dirty script to build packages
--- when Runtime can successfully build itself,
+-- when the import package can be built by the CLI,
 -- this can be scrapped
 
 -- Location of package
-local TO_BUILD = "./Packages/Hawaii.Runtime/src"
+local TO_BUILD = "./Packages/Hawaii.Import/src"
 
 -- How wide to output the Base64 formatted HWI files
 local COLUMN_SIZE = 80
@@ -96,9 +96,9 @@ for i = 1, lines do
 end
 
 -- clone exports in Hawaii.RuntimeBuilder to /build
-if ALWAYS_REBUILD or not fs.isDir("build") then fs.copy("Packages/Hawaii.RuntimeBuilder/exports", "build", ALWAYS_REBUILD) end
-fs.writeFile("build/Hawaii.Runtime.hwi", table.concat(streamblobs))
-fs.writeFile("build/core.hwi.luau", `return ([[\n{table.concat(sections, "\n")}\n]])`)
+if ALWAYS_REBUILD or not fs.isDir("build") then fs.copy("Packages/Hawaii.Bootstrapper/exports", "build", ALWAYS_REBUILD) end
+fs.writeFile("build/Hawaii.Import.hwi", table.concat(streamblobs))
+fs.writeFile("build/engine.hwi.luau", `return ([[\n{table.concat(sections, "\n")}\n]])`)
 
 if ENABLE_PROC_GEN then
 	warn("Process Generation is currently unstable and may produce unreliable results")

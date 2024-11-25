@@ -1,0 +1,7 @@
+# Import Engine
+# Just implements the Import and export syntax, this is the only package referenced by
+# the bootstrapper before it loads the .chwi
+name = "Hawaii.Import"
+
+[directories]
+source = "src"
