@@ -45,6 +45,10 @@ local function HWIPackageStream(name: string, packageStream: buffer)
 			if not pkg then
 				pkg = HWI(buffer.fromstring(serde.decompress("zlib", self.content)))
 				self.loadedPackage = pkg
+
+				if pkg.name ~= self.name then
+					error("CHWI <> HWI name mismatch")
+				end
 			end
 
 			return pkg
@@ -62,7 +66,7 @@ return function(b: buffer): CHWIPackage
 		error(`version {v} out of range {CHWI_FORMAT_MIN_VERSION} - {CHWI_FORMAT_MAX_VERSION}`)
 	end
 
-	local offsetPtr = {offset = 4}
+	local offsetPtr = {offset = 5}
 	local packageName = BasicTypes.ReadString(b, offsetPtr)
 	local entryPoint = BasicTypes.ReadString(b, offsetPtr)
 	local sizeHWIs = BasicTypes.ULEB128(b, offsetPtr)
@@ -73,6 +77,7 @@ return function(b: buffer): CHWIPackage
 			local importType = buffer.readu8(b, offsetPtr.offset)
 			offsetPtr.offset += 1
 			if importType ~= 0 then
+				print(importType)
 				error("Invalid import type")
 			end
 
@@ -84,7 +89,7 @@ return function(b: buffer): CHWIPackage
 	end
 
 	-- open the entry file
-	local entryPoint = files[entryPoint]
+	entryPoint = files[entryPoint]
 	if not entryPoint then
 		error("no available entry point in package")
 	end

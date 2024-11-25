@@ -94,6 +94,7 @@ return function(b: buffer): HWIPackage
 
 	if sizeDependencies > 0 then
 		for dID = 1, sizeDependencies do
+			-- alias = actual package identifier in parent CHWI
 			dependencies[BasicTypes.ReadString(b, offsetPtr)] = BasicTypes.ReadString(b, offsetPtr)
 		end
 	end
