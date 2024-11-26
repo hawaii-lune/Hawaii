@@ -67,7 +67,7 @@ local function generateRelativeImporter(self: RuntimeContext, ctx: PackageContex
 
 				if init == "@" then
 					-- package reference based on alias
-					local resolvedContext = ctx.LazyDependencies[rhs]
+					local resolvedContext = ctx.LazyDependencies[string.lower(rhs)]
 					if not resolvedContext then error(`Cant find package from alias {rhs}`) end
 
 					exportWorker = self:LoadPackage(resolvedContext)
@@ -247,7 +247,7 @@ function ImportEngine.Public.newRuntimeContext(name: string): RuntimeContext
 			for alias, packageID in context.Package.config.dependencies do
 				local pkgRef = self.Packages[packageID]
 				if not pkgRef then error(`could not load package {packageID} for {package}`) end
-				context.LazyDependencies[alias] = pkgRef
+				context.LazyDependencies[string.lower(alias)] = pkgRef
 			end
 		end
 	end
