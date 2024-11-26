@@ -211,7 +211,6 @@ function ImportEngine.Public.newRuntimeContext(name: string): RuntimeContext
 		if not export then
 			export = self:LoadObject(package, entryPath)
 			export.EntryExport = export
-			if export.main then error("Cant LoadLibrary a runtime package") end
 		end
 
 		return export
