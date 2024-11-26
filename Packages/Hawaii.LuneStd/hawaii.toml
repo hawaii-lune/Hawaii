@@ -1,0 +1,4 @@
+name = "Hawaii.LuneStdBindings"
+
+[directories]
+source = "src"
