@@ -14,7 +14,7 @@ local fs = require("@lune/fs") -- TODO: lune std bindings, this is an evil hack
 -- fragment, then adds the CHWI file as ".chwi.luau"
 
 -- Because of CHWI writers may be of different formats, we need to allow a buffer write here
-function exports.CreateBuildFragment(outDir: string, runtimeHWI: buffer, chwi: buffer)
+function exports.CreateBuildFragment(outDir: string, chwi: buffer)
 	local exportsObjectPatten = "^/objects/(.-)$"
 	local linkableSourceObjects = {}
 	
@@ -34,8 +34,9 @@ function exports.CreateBuildFragment(outDir: string, runtimeHWI: buffer, chwi: b
 		fs.writeFile(`{outDir}/{stream}`, buffer.tostring(stream))
 	end
 
-	fs.writeFile(`{outDir}/core.hwi.luau`, buffer.tostring(runtimeHWI))
 	fs.writeFile(`{outDir}/.chwi.luau`, buffer.tostring(chwi))
 end
 
+exports.Bookstrapper, exports.ImportEngine, exports.PackageIO =
+	import("Bookstrapper", "ImportEngine", "PackageIO") .from("/FFI/Bootstrapper")
 return exports

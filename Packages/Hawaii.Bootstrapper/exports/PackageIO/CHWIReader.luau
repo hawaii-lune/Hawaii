@@ -1,7 +1,7 @@
-local CHWI_FORMAT_MIN_VERSION, CHWI_FORMAT_MAX_VERSION = 0, 0
 local serde = require("@lune/serde")
-local BasicTypes = require("./BasicTypes.luau")
-local HWI = require("./HWI.luau")
+local BasicTypes = require("./BasicTypes")
+local HWI = require("./HWIReader")
+local VersionConfig = require("./VersionConfig")
 
 -- Object to load a CHWI file instead of a HWI
 -- These are considerably easier to load since its effectively a list of HWI files and how to find them
@@ -20,19 +20,7 @@ local HWI = require("./HWI.luau")
 -- 1: imported - not enabled
 -- package name
 -- content or import path
-
-export type HWIPackageStream = {
-	name: string,
-	content: buffer,
-	loadedPackage: HWI.HWIPackage?,
-	Open: (HWIPackageStream) -> HWI.HWIPackage
-} 
-
-export type CHWIPackage = {
-	name: string,
-	entry: HWI.HWIPackage, -- entry package is loaded into context
-	packages: {[string]: HWIPackageStream}
-}
+local Types = require("./Types")
 
 type CHWIFile = {}
 
@@ -56,14 +44,14 @@ local function HWIPackageStream(name: string, packageStream: buffer)
 	}
 end
 
-return function(b: buffer): CHWIPackage
+return function(b: buffer): Types.CHWIPackage
 	if buffer.readstring(b, 0, 4) ~= "CHWI" then
 		error("bad magic header")
 	end
 
 	local v = buffer.readu8(b, 4)
-	if v < CHWI_FORMAT_MIN_VERSION or v > CHWI_FORMAT_MAX_VERSION then
-		error(`version {v} out of range {CHWI_FORMAT_MIN_VERSION} - {CHWI_FORMAT_MAX_VERSION}`)
+	if v < VersionConfig.CHWI_MIN or v > VersionConfig.CHWI_MAX then
+		error(`version out of range {VersionConfig.CHWI_MIN} <= {v} < {VersionConfig.CHWI_MAX}`)
 	end
 
 	local offsetPtr = {offset = 5}

@@ -1,35 +1,10 @@
 -- HWI package.
-local HWI_FORMAT_MIN_VERSION, HWI_FORMAT_MAX_VERSION = 0, 0
 local serde = require("@lune/serde")
-local BasicTypes = require("./BasicTypes.luau")
+local BasicTypes = require("./BasicTypes")
+local Types = require("./Types")
+local VersionConfig = require("./VersionConfig")
 
-type HWIObject = {
-	compressed: boolean,
-	filePath: string?,
-	content: buffer,
-	Open: (HWIObject) -> buffer
-}
-
-type HWIConfig = {
-	--this should be json permitted objects
-
-	entry: string?,
-	compiled: boolean,
-	compressed: boolean,
-	native: boolean,
-	dependencies: {[string]: string}
-}
-
-export type HWIPackage = {
-	objects: {[string]: HWIObject},
-	name: string,
-	config: HWIConfig,
-	export: {[string]: string}?, -- technically a HawaiiExport type but not really relevant here
-	-- since you shouldn't be directly accessing this
-	dependencies: {[string]: HWIPackage},
-}
-
-local function HWIObject(): HWIObject
+local function HWIObject(): Types.HWIObject
 	return {
 		compressed = false,
 		hash = nil,
@@ -43,8 +18,8 @@ local function HWIObject(): HWIObject
 	}
 end
 
-local function newHWI(name: string): HWIPackage
-	local hwi = {} :: HWIPackage
+local function newHWI(name: string): Types.HWIPackage
+	local hwi = {} :: Types.HWIPackage
 	hwi.name = name
 	hwi.config = {
 		compressed = false,
@@ -53,18 +28,17 @@ local function newHWI(name: string): HWIPackage
 		dependencies = {}
 	}
 	hwi.objects = {}
-	hwi.dependencies = {}
 	return hwi
 end
 
-return function(b: buffer): HWIPackage
+return function(b: buffer): Types.HWIPackage
 	if buffer.readstring(b, 0, 3) ~= "HWI" then
 		error("bad magic header")
 	end
 
 	local v = buffer.readu8(b, 3)
-	if v < HWI_FORMAT_MIN_VERSION or v > HWI_FORMAT_MAX_VERSION then
-		error(`version {v} out of range {HWI_FORMAT_MIN_VERSION} - {HWI_FORMAT_MAX_VERSION}`)
+	if v < VersionConfig.HWI_MIN or v > VersionConfig.HWI_MAX then
+		error(`version out of range {VersionConfig.HWI_MIN} <= {v} < {VersionConfig.HWI_MAX}`)
 	end
 
 	local offsetPtr = {offset = 4}
@@ -100,7 +74,7 @@ return function(b: buffer): HWIPackage
 	end
 	config.dependencies = dependencies
 
-	local pkg: HWIPackage = newHWI(packageName)
+	local pkg: Types.HWIPackage = newHWI(packageName)
 	pkg.config = config
 	local sizeHeaders = BasicTypes.ULEB128(b, offsetPtr)
 

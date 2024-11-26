@@ -10,7 +10,7 @@ Bookstrapper:Initialize("Hawaii.Bootstrapper")
 
 Bookstrapper = {}
 
-local CHWI = require("./CHWI")
+local PackageIO = require("./PackageIO")
 local Base64 = require("./Base64")
 local process = require("@lune/process")
 
@@ -23,23 +23,21 @@ local function Depackage(source: string)
 	return Base64.decode(stream)
 end
 
-local chwiPackage = CHWI(Depackage(PackageContent))
+local chwiPackage = PackageIO.CHWIReader(Depackage(PackageContent))
 
 -- The CorePackage contains code to pick itself up from an external entry, the entry point is known as the
 -- "starter"
 
 local context = ImportEngine.Public.fromCHWI(chwiPackage)
-local sysPkg = context.Packages["Hawaii.System"]
+local sysPkg = context.Packages["Hawaii.Bootstrapper"]
 
-ImportEngine.setExport(context, sysPkg, "/FFI/Bootstrapper.luau", {
-	ImportEngine = ImportEngine.Public,
-	Bookstrapper = Bookstrapper,
-	-- TODO: allow these dependencies into system
-	-- HWI = require("./HWI")
-	-- CHWI = CHWI
-})
-
-print(context.Packages["Hawaii.System"].Modules["/FFI/Bootstrapper.luau"].Bookstrapper)
+if sysPkg then
+	ImportEngine.setExport(context, sysPkg, "/FFI/Bootstrapper.luau", {
+		ImportEngine = ImportEngine.Public,
+		Bookstrapper = Bookstrapper,
+		PackageIO = PackageIO
+	})
+end
 
 local argv = process.args
 context:Run(argv)
