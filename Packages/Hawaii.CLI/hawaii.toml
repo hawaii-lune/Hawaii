@@ -4,5 +4,5 @@ name = "Hawaii.CLI"
 source = "src"
 
 [dependencies]
-System = {path = "../Hawaii.System"}
+Bootstrapper = {path = "../Hawaii.Bootstrapper"}
 Builder = {path = "../Hawaii.Builder"}

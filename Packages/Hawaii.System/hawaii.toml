@@ -1,5 +1,0 @@
-# Core System exports that are useful to developers
-name = "Hawaii.System"
-
-[directories]
-source = "src"
