@@ -46,6 +46,7 @@ export type HWIWriter = {
 	config: HWIConfig,
 	objects: {[string]: buffer},
 	AddObject: (HWIWriter, ObjectType, path: string, stream: buffer) -> (),
+	AttachPrebuiltHWI: (HWIWriter, prebuilt: buffer) -> (),
 	SetEntryPath: (HWIWriter, path: string) -> (),
 	ToBuffer: (HWIWriter) -> buffer,
 	content: buffer?,

@@ -137,6 +137,12 @@ return function(packageName: string)
 	}
 	pkg.objects = {}
 
+	function pkg.AttachPrebuiltHWI(self: Types.HWIWriter, prebuild: buffer)
+		-- adds an existing HWI file to the writer
+		-- TODO: this should validate the HWI object
+		pkg.content = prebuild
+	end
+
 	function pkg.AddObject(self: Types.HWIWriter, objType: Types.ObjectType, path: string, stream: buffer)
 		local directory = OBJECT_TYPE_PATH_MAP[objType] or error(`Invalid path type {objType}`)
 		pkg.objects[`{directory}/{path}`] = stream
