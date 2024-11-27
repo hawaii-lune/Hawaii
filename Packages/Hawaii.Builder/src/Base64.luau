@@ -162,7 +162,5 @@ local function decode(input: buffer): buffer
 	return output
 end
 
-return {
-	encode = encode,
-	decode = decode,
-}
+exports.encode = encode
+exports.decode = decode

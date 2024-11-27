@@ -56,9 +56,9 @@ end
 
 local function getBitFlag(self: Types.HWIWriter)
 	return
-		if self.config.compressed then 1 else 0
-		+ if self.config.compiled then 2 else 0
-		+ if self.config.native then 4 else 0
+		(if self.config.compressed then 1 else 0)
+		+ (if self.config.compiled then 2 else 0)
+		+ (if self.config.native then 4 else 0)
 end
 
 local function bufferWriter(self: Types.HWIWriter): buffer

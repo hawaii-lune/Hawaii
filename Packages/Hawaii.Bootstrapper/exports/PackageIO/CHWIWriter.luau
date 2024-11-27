@@ -32,7 +32,6 @@ return function(pkgName: string, entry: Types.HWIWriter, streams: {Types.HWIWrit
 	for i = 1, sizeStreams do
 		local stream = streams[i]
 
-		print(stream)
 		if stream.name == entryName then entryFileFound = true end
 		local source = serde.compress("zlib", stream:ToBuffer())
 		contentSizes[(i*2)-1] = string.len(stream.name)

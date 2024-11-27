@@ -128,7 +128,7 @@ local function loadCallmangler(self: RuntimeContext, package: PackageContext, ob
 	end
 
 	local callmangler = luau.load(bytecode, {
-		debugName = `{self.Name}:{package.Name}/{object}`,
+		debugName = `/{self.Name}/{package.Name}{object}`,
 		codegenEnabled = hwi.config.native
 	})
 
@@ -226,7 +226,10 @@ function ImportEngine.Public.newRuntimeContext(name: string): RuntimeContext
 		local runtimePackage, runtimePath = getEntryItem(self)
 		local export = self:LoadObject(runtimePackage, runtimePath)
 		if not export.main then error("Cant load runtime package because its export does not have a main function") end
-		export.main(#args, args)
+		
+		local code = export.main(#args, args)
+		if not code or type(code) ~= "number" then code = 0 end
+		return code
 	end
 
 	function rtCTX.AddPackage(self: RuntimeContext, packageObject: HWI, isEntry: boolean)

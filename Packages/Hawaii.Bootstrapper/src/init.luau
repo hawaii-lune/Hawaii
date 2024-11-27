@@ -8,18 +8,27 @@
 -- Several libraries can create the CHWI files, but we suggest Hawaii.HWIWriter
 -- which creates a HWI-compatible object.
 
-local fs = require("@lune/fs") -- TODO: lune std bindings, this is an evil hack
+local fs = require("@lune/fs")
+
+local function buildDirectoryTree(filePath: string)
+	local components = string.split(filePath, "/")
+	local cwd = table.remove(components, 1)
+	for _, component in components do
+		if not fs.isDir(cwd) then fs.writeDir(cwd) end
+		cwd ..= `/{component}`
+	end
+end
 
 -- Copies all objects from the /exports/ folder into a new build
 -- fragment, then adds the CHWI file as ".chwi.luau"
 
 -- Because of CHWI writers may be of different formats, we need to allow a buffer write here
-function exports.CreateBuildFragment(outDir: string, chwi: buffer)
+function exports.ExtractBootstrapper(outDir: string)
 	local exportsObjectPatten = "^/objects/(.-)$"
 	local linkableSourceObjects = {}
 	
 	for _, object in package.objects do
-		local objectName = string.match(object.Name, exportsObjectPatten)
+		local objectName = string.match(object.filePath, exportsObjectPatten)
 		if objectName then
 			linkableSourceObjects[objectName] = object
 		end
@@ -30,11 +39,10 @@ function exports.CreateBuildFragment(outDir: string, chwi: buffer)
 	end
 
 	for name, object in linkableSourceObjects do
-		local stream = object:Read()
-		fs.writeFile(`{outDir}/{stream}`, buffer.tostring(stream))
+		local stream = object:Open()
+		buildDirectoryTree(`{outDir}/{name}`)
+		fs.writeFile(`{outDir}/{name}`, stream)
 	end
-
-	fs.writeFile(`{outDir}/.chwi.luau`, buffer.tostring(chwi))
 end
 
 exports.Bookstrapper, exports.ImportEngine, exports.PackageIO =

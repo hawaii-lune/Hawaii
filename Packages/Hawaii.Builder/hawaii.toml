@@ -4,4 +4,4 @@ name = "Hawaii.Builder"
 source = "src"
 
 [dependencies]
-Bootstrapper = {path = "../Hawaii.Bootstrapper"}
+bootstrapper = {path = "../Hawaii.Bootstrapper"}

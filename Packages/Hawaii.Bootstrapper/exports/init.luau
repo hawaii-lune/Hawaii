@@ -40,4 +40,4 @@ if sysPkg then
 end
 
 local argv = process.args
-context:Run(argv)
+process.exit(context:Run(argv))

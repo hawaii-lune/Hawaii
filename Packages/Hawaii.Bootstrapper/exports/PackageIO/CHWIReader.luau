@@ -65,7 +65,6 @@ return function(b: buffer): Types.CHWIPackage
 			local importType = buffer.readu8(b, offsetPtr.offset)
 			offsetPtr.offset += 1
 			if importType ~= 0 then
-				print(importType)
 				error("Invalid import type")
 			end
 
