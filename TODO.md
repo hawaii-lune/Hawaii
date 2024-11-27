@@ -3,7 +3,7 @@ note, this is remaining todos as of commit #4d12442, todos before then arent't t
 
 # High Priority
 
-* [ ] - Self-building
+* [x] - Self-building
 * [ ] - `Hawaii.CLI` package
 
 # Medium Priority
