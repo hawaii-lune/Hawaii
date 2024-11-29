@@ -1,6 +1,6 @@
 {
-	"name": "Hawaii-RTDebug",
+	"name": "Hawaii-Bootstrapper",
 	"tree": {
-		"$path": "build"
+		"$path": "src"
 	}
 }

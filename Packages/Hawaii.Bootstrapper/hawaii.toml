@@ -2,4 +2,4 @@ name = "Hawaii.Bootstrapper"
 
 [directories]
 source = "src"
-objects = "exports"
+objects = "../../src"
