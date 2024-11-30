@@ -12,11 +12,6 @@ This project can be built by installing lune, then running the command:
 lune run .lune
 ```
 
-For now, this runs a quickly put together build script that clones
-`Packages\Hawaii.RuntimeBuilder\exports`, and then builds a debug `HWI` file.
-
-The build script has several options that may help you configure how its built,
-you can also enable EXE building, though this isn't that reliable as of current.
-
-As this project develops, hopefully I'll be able to make it compile itself so
-we dont need this.
+This has built itself successfully and the build file can be found in releases,
+we will use this to incrementally build the project from now on, but should still
+not be used for runtime logic as of current.
