@@ -1,6 +1,7 @@
 name = "Hawaii.Builder"
 
 [directories]
+objects = "../../src"
 source = "src"
 
 [dependencies]

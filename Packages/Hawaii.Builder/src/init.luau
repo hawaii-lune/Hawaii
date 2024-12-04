@@ -1,7 +1,8 @@
 -- Hawaii.Builder
 -- technically a runtime component but detatched for ease of use externally
 
-local ExtractBootstrapper, PackageIO = import ("ExtractBootstrapper", "PackageIO") .from "@system"
+local PackageIO = import ("PackageIO") .from "@system"
+local ExtractBootstrapper = import "ExtractBootstrapper" .from "/source/BootstrapperBuilder"
 local Base64 = import "*" .from "/source/Base64"
 local process = require("@lune/process")
 local serde = require("@lune/serde")
@@ -243,12 +244,14 @@ exports._CLI_ENTRY = {
 		},
 
 		[{"b", "bootstrapper"}] = {
-			Description = "Build with Bootstrapper files."
+			Description = "Build with Bootstrapper files. Allows custom bootstrapper source passing.",
+			ArgumentOptional = true,
+			ArgumentShorthand = "BOOTSTRAPPER"
 		},
 
 		[{"p", "procgen"}] = {
 			Description = "Enables native process generation, either uses target, or native system. PROCGEN automatically enables -b and -c flags.",
-			ArgumentOption = true,
+			ArgumentOptional = true,
 			ArgumentShorthand = "TARGET"
 		}
 	},

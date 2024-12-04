@@ -7,5 +7,7 @@
   },
   "luau-lsp.types.definitionFiles": [
     "hawaii.d.luau"
-  ]
+  ],
+  "luau-lsp.sourcemap.autogenerate": false,
+  "luau-lsp.sourcemap.enabled": false
 }
