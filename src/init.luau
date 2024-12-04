@@ -13,6 +13,7 @@ Bookstrapper = {}
 local PackageIO = require("./PackageIO")
 local Base64 = require("./Base64")
 local process = require("@lune/process")
+local URI = require("./URI")
 
 local ImportEngine = require("./ImportEngine")
 local PackageContent = require("./.chwi.luau")
@@ -34,7 +35,8 @@ local sysPkg = context.Packages["Hawaii.System"]
 if sysPkg then
 	ImportEngine.setExport(context, sysPkg, "/FFI/Bootstrapper.luau", {
 		Bookstrapper = Bookstrapper,
-		PackageIO = PackageIO
+		PackageIO = PackageIO,
+		URI = URI
 	})
 end
 

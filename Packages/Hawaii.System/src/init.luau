@@ -32,5 +32,5 @@ function exports.ExtractBootstrapper(outDir: string)
 end
 
 exports.Bookstrapper, exports.ImportEngine, exports.PackageIO =
-	import("Bookstrapper", "PackageIO") .from("/FFI/Bootstrapper")
+	import("Bookstrapper", "PackageIO", "URI") .from("/FFI/Bootstrapper")
 return exports
