@@ -1,4 +1,4 @@
-name = "Hawaii.Bootstrapper"
+name = "Hawaii.System"
 
 [directories]
 source = "src"

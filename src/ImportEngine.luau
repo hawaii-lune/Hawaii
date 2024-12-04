@@ -4,9 +4,7 @@
 
 local PackageIO = require("./PackageIO")
 
-local ImportEngine = {
-	Public = {}
-}
+local ImportEngine = {}
 
 local luau = require("@lune/luau")
 type Exportable = {[string]: any}
@@ -162,7 +160,7 @@ local function threadWorker(
 	table.clear(objectState.heldThreads)
 end
 
-function ImportEngine.Public.newRuntimeContext(name: string): RuntimeContext
+function ImportEngine.newRuntimeContext(name: string): RuntimeContext
 	local rtCTX = {} :: RuntimeContext
 	rtCTX.Name = name
 	rtCTX.Packages = {}
@@ -257,8 +255,8 @@ function ImportEngine.Public.newRuntimeContext(name: string): RuntimeContext
 	return rtCTX
 end
 
-function ImportEngine.Public.fromCHWI(chwi: PackageIO.CHWIPackage): RuntimeContext
-	local rtCTX: RuntimeContext = ImportEngine.Public.newRuntimeContext(chwi.name)
+function ImportEngine.fromCHWI(chwi: PackageIO.CHWIPackage): RuntimeContext
+	local rtCTX: RuntimeContext = ImportEngine.newRuntimeContext(chwi.name)
 
 	for _, packageStream in chwi.packages do
 		local object = packageStream:Open()

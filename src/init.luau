@@ -28,12 +28,11 @@ local chwiPackage = PackageIO.CHWIReader(Depackage(PackageContent))
 -- The CorePackage contains code to pick itself up from an external entry, the entry point is known as the
 -- "starter"
 
-local context = ImportEngine.Public.fromCHWI(chwiPackage)
-local sysPkg = context.Packages["Hawaii.Bootstrapper"]
+local context = ImportEngine.fromCHWI(chwiPackage)
+local sysPkg = context.Packages["Hawaii.System"]
 
 if sysPkg then
 	ImportEngine.setExport(context, sysPkg, "/FFI/Bootstrapper.luau", {
-		ImportEngine = ImportEngine.Public,
 		Bookstrapper = Bookstrapper,
 		PackageIO = PackageIO
 	})

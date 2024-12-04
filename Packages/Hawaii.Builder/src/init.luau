@@ -1,7 +1,7 @@
 -- Hawaii.Builder
 -- technically a runtime component but detatched for ease of use externally
 
-local ExtractBootstrapper, PackageIO = import ("ExtractBootstrapper", "PackageIO") .from "@bootstrapper"
+local ExtractBootstrapper, PackageIO = import ("ExtractBootstrapper", "PackageIO") .from "@system"
 local Base64 = import "*" .from "/source/Base64"
 local process = require("@lune/process")
 local serde = require("@lune/serde")
